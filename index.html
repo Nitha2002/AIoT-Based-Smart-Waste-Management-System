@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Haritha Karma Sena — Smart Waste Management</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ── VARIABLES ── */
+:root {
+  --g1:#0d4a26; --g2:#1a7a40; --g3:#2db862; --g4:#c8f0d8; --g5:#f0faf4;
+  --acc:#f5a623; --red:#e53e3e; --blue:#3182ce;
+  --txt:#0d1f13; --muted:#5a7566; --border:#d6edde; --white:#fff;
+  --shadow:0 2px 16px rgba(13,74,38,.09);
+  --r:12px; --r-sm:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:var(--g5);color:var(--txt);min-height:100vh}
+
+/* ── PAGES ── */
+.page{display:none;min-height:100vh;flex-direction:column}
+.page.active{display:flex}
+
+/* ── NAV ── */
+nav{background:var(--white);border-bottom:1.5px solid #d6edde;padding:0 28px;height:60px;
+    display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:99}
+.brand{display:flex;align-items:center;gap:9px;font-weight:800;font-size:17px;color:var(--g1);letter-spacing:-.3px}
+.brand-icon{width:32px;height:32px;background:var(--g2);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:18px}
+.nav-right{display:flex;align-items:center;gap:10px}
+.role-chip{background:var(--g4);color:var(--g1);padding:4px 12px;border-radius:20px;font-size:13px;font-weight:600}
+
+/* ── SIDEBAR LAYOUT ── */
+.layout{display:flex;flex:1}
+.sidebar{width:220px;background:var(--white);border-right:1.5px solid #d6edde;
+         padding:20px 12px;display:flex;flex-direction:column;gap:3px;
+         position:sticky;top:60px;height:calc(100vh - 60px);overflow-y:auto}
+.si{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:var(--r-sm);
+    cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);
+    border:none;background:none;width:100%;text-align:left;transition:all .15s}
+.si:hover{background:var(--g4);color:var(--g1)}
+.si.active{background:var(--g1);color:#fff}
+.si-icon{font-size:16px;width:20px;text-align:center}
+.sdiv{height:1px;background:#d6edde;margin:8px 0}
+.content{flex:1;padding:28px;overflow-y:auto;max-width:1100px}
+
+/* ── BUTTONS ── */
+.btn{padding:9px 20px;border-radius:var(--r-sm);border:none;cursor:pointer;
+     font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;transition:all .18s;display:inline-flex;align-items:center;gap:6px}
+.btn-p{background:var(--g1);color:#fff}.btn-p:hover{background:var(--g2);transform:translateY(-1px)}
+.btn-o{background:transparent;border:1.5px solid var(--g1);color:var(--g1)}.btn-o:hover{background:var(--g4)}
+.btn-acc{background:var(--acc);color:#fff}.btn-acc:hover{opacity:.9}
+.btn-sm{padding:6px 14px;font-size:13px}
+.btn-lg{padding:13px 28px;font-size:15px;width:100%;justify-content:center}
+.btn-ghost{background:transparent;color:var(--muted);border:none;font-size:13px;cursor:pointer;padding:4px 8px}
+
+/* ── CARDS ── */
+.card{background:var(--white);border-radius:var(--r);border:1.5px solid #d6edde;box-shadow:var(--shadow);padding:22px}
+.stat{background:var(--white);border-radius:var(--r);border:1.5px solid #d6edde;padding:18px 22px}
+.stat-l{font-size:12px;font-weight:600;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px}
+.stat-v{font-size:26px;font-weight:800;color:var(--g1);font-family:'Space Mono',monospace}
+.stat-s{font-size:12px;color:var(--muted);margin-top:3px}
+
+/* ── GRIDS ── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.g4{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+
+/* ── FORMS ── */
+.fg{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.fg label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.fg input,.fg select,.fg textarea{padding:10px 13px;border:1.5px solid #d6edde;border-radius:var(--r-sm);
+  font-family:'Nunito',sans-serif;font-size:14px;background:var(--g5);color:var(--txt);outline:none;transition:border .18s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--g2);background:#fff}
+.fg-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ── ALERTS ── */
+.alert{padding:11px 15px;border-radius:var(--r-sm);font-size:13px;font-weight:500;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.a-ok{background:#dcfce7;color:#166534;border:1px solid #86efac}
+.a-err{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5}
+.a-warn{background:#fef3c7;color:#92400e;border:1px solid #fcd34d}
+.a-info{background:#dbeafe;color:#1e40af;border:1px solid #93c5fd}
+
+/* ── BADGES ── */
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;letter-spacing:.03em}
+.b-g{background:#dcfce7;color:#166534}.b-y{background:#fef3c7;color:#92400e}
+.b-r{background:#fee2e2;color:#991b1b}.b-gr{background:#f3f4f6;color:#374151}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;padding:10px 14px;font-size:11px;font-weight:700;color:var(--muted);
+   text-transform:uppercase;letter-spacing:.05em;border-bottom:1.5px solid #d6edde}
+td{padding:12px 14px;font-size:13px;border-bottom:1px solid #d6edde}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--g5)}
+
+/* ── PAGE HEADER ── */
+.ph{margin-bottom:24px}
+.ph h1{font-size:24px;font-weight:800;letter-spacing:-.4px}
+.ph p{color:var(--muted);font-size:13px;margin-top:3px}
+.sec-title{font-size:14px;font-weight:700;margin-bottom:14px;color:var(--txt)}
+
+/* ── FILL BAR ── */
+.fb-bg{background:#d6edde;border-radius:6px;height:8px;overflow:hidden}
+.fb{height:100%;border-radius:6px;transition:width .5s}
+
+/* ── LOGIN PAGE ── */
+#pg-login{background:linear-gradient(145deg,#0a3018 0%,#1a7a40 60%,#2db862 100%);
+          justify-content:center;align-items:center;padding:20px}
+.login-wrap{background:#fff;border-radius:20px;padding:44px 40px;width:100%;max-width:440px;
+            box-shadow:0 32px 80px rgba(0,0,0,.28)}
+.login-hd{text-align:center;margin-bottom:28px}
+.login-hd .ico{width:56px;height:56px;background:var(--g1);border-radius:14px;
+               display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 12px}
+.login-hd h1{font-size:22px;font-weight:800;color:var(--g1);letter-spacing:-.3px}
+.login-hd p{color:var(--muted);font-size:13px;margin-top:3px}
+.tabs{display:flex;background:var(--g5);border-radius:10px;padding:4px;gap:3px;margin-bottom:22px}
+.tab{flex:1;padding:8px;border-radius:7px;border:none;cursor:pointer;font-size:13px;font-weight:600;
+     background:none;color:var(--muted);transition:all .18s;font-family:'Nunito',sans-serif}
+.tab.active{background:#fff;color:var(--g1);box-shadow:0 2px 8px rgba(0,0,0,.1)}
+.toggle-link{background:none;border:none;color:var(--g2);font-size:13px;font-weight:600;
+             cursor:pointer;text-decoration:underline;font-family:'Nunito',sans-serif}
+
+/* ── MAP PLACEHOLDER ── */
+.map-ph{background:linear-gradient(135deg,var(--g4),#a7f0c4);border-radius:var(--r);
+        height:260px;display:flex;align-items:center;justify-content:center;
+        flex-direction:column;gap:6px;border:1.5px dashed var(--g3);color:var(--g1)}
+
+/* ── STAR RATING ── */
+.stars{display:flex;gap:4px}.star{font-size:26px;cursor:pointer;color:#d1d5db;transition:color .1s}.star.on{color:var(--acc)}
+
+/* ── NOTIFICATION ── */
+.notif-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--red);margin-left:4px;vertical-align:middle}
+.pulse{animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+.fade-up{animation:fadeUp .3s ease forwards}
+
+/* ── PAYMENT ── */
+.pay-sum{background:var(--g4);border-radius:var(--r-sm);padding:14px 16px;margin-bottom:14px}
+.pay-row{display:flex;justify-content:space-between;font-size:13px;padding:3px 0}
+.pay-total{font-weight:700;font-size:15px;border-top:1px solid #d6edde;padding-top:8px;margin-top:6px}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:40px 20px;color:var(--muted)}
+.empty .ei{font-size:40px;margin-bottom:8px}
+.empty p{font-size:14px}
+
+@media(max-width:768px){.g2,.g3,.g4{grid-template-columns:1fr}.sidebar{display:none}.content{padding:16px}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.pay-success-overlay{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;display:flex;align-items:center;justify-content:center}
+.pay-success-box{background:#fff;border-radius:20px;padding:40px;text-align:center;max-width:360px;box-shadow:0 24px 60px rgba(0,0,0,.2)}
+.pay-success-icon{font-size:60px;margin-bottom:12px}
+.pay-success-title{font-size:22px;font-weight:800;color:var(--g1);margin-bottom:6px}
+.pay-success-sub{font-size:13px;color:var(--muted);margin-bottom:20px}
+.pay-fail-box .pay-success-icon{color:var(--red)}
+.pay-fail-box .pay-success-title{color:var(--red)}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+  LOGIN PAGE
+══════════════════════════════════════════ -->
+<div id="pg-login" class="page active">
+  <div class="login-wrap">
+    <div class="login-hd">
+      <div class="ico">♻️</div>
+      <h1>Haritha Karma Sena</h1>
+      <p>Smart Waste Management System</p>
+    </div>
+
+    <!-- Role tabs -->
+    <div class="tabs">
+      <button class="tab active" onclick="setRole('user',this)">👤 User</button>
+      <button class="tab" onclick="setRole('worker',this)">🚛 Worker</button>
+      <button class="tab" onclick="setRole('admin',this)">🛡️ Admin</button>
+    </div>
+
+    <!-- Error / success box -->
+    <div id="auth-msg" style="display:none"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="frm-login">
+      <div class="fg"><label>Username</label><input id="li-user" placeholder="Enter username"></div>
+      <div class="fg"><label>Password</label><input id="li-pass" type="password" placeholder="Enter password"></div>
+      <button class="btn btn-p btn-lg" onclick="doLogin()">Sign In →</button>
+      <div id="reg-link-wrap" style="text-align:center;margin-top:14px;font-size:13px;color:var(--muted)">
+        Don't have an account? <button class="toggle-link" onclick="showForm('frm-register')">Register</button>
+      </div>
+    </div>
+
+    <!-- USER REGISTER FORM -->
+    <div id="frm-register" style="display:none">
+      <div style="font-size:15px;font-weight:700;margin-bottom:16px;color:var(--g1)">Create Account</div>
+      <div class="fg-row">
+        <div class="fg"><label>Full Name</label><input id="r-name" placeholder="Your name"></div>
+        <div class="fg"><label>Phone</label><input id="r-phone" placeholder="9XXXXXXXXX" maxlength="10"></div>
+      </div>
+      <div class="fg"><label>Address</label><input id="r-addr" placeholder="House / Street"></div>
+      <div class="fg-row">
+        <div class="fg"><label>Panchayath</label><input id="r-panch" placeholder="Panchayath"></div>
+        <div class="fg"><label>Ward No.</label><input id="r-ward" placeholder="Ward #" type="number"></div>
+      </div>
+      <div class="fg-row">
+        <div class="fg"><label>Username</label><input id="r-uname" placeholder="Choose username"></div>
+        <div class="fg"><label>Password</label><input id="r-pass" type="password" placeholder="Min 6 chars"></div>
+      </div>
+      <!-- Worker code field (hidden by default) -->
+      <div class="fg" id="worker-code-field" style="display:none">
+        <label>Worker Registration Code</label>
+        <input id="r-wcode" placeholder="Enter code provided by admin">
+        <span style="font-size:11px;color:var(--muted);margin-top:3px">Contact your administrator for the registration code</span>
+      </div>
+      <button class="btn btn-p btn-lg" style="margin-top:4px" onclick="doRegister()">Create Account</button>
+      <div style="text-align:center;margin-top:12px;font-size:13px;color:var(--muted)">
+        Already registered? <button class="toggle-link" onclick="showForm('frm-login')">Sign In</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  USER DASHBOARD
+══════════════════════════════════════════ -->
+<div id="pg-user" class="page">
+  <nav>
+    <div class="brand"><div class="brand-icon">♻️</div> Haritha Karma Sena</div>
+    <div class="nav-right">
+      <span class="role-chip">👤 <span id="u-name-chip">User</span></span>
+      <button class="btn btn-o btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="layout">
+    <div class="sidebar">
+      <button class="si active" onclick="uTab('u-home',this)"><span class="si-icon">📊</span>Dashboard</button>
+      <button class="si" onclick="uTab('u-bin',this)"><span class="si-icon">🗑️</span>Bin Status</button>
+      <button class="si" onclick="uTab('u-pay',this)"><span class="si-icon">💳</span>Payment</button>
+      <button class="si" onclick="uTab('u-hist',this)"><span class="si-icon">📋</span>History</button>
+      <div class="sdiv"></div>
+      <button class="si" onclick="uTab('u-fb',this)"><span class="si-icon">⭐</span>Feedback</button>
+    </div>
+    <div class="content">
+
+      <!-- DASHBOARD -->
+      <div id="u-home" class="usec fade-up">
+        <div class="ph"><h1>Welcome! 👋</h1><p id="u-welcome-sub">Your waste management overview</p></div>
+        <div class="g4" style="margin-bottom:20px">
+          <div class="stat"><div class="stat-l">Bin Status</div><div class="stat-v" id="u-bin-status">Half Full</div><div class="stat-s">Updated 5 min ago</div></div>
+          <div class="stat"><div class="stat-l">Bin Weight</div><div class="stat-v">3.2 <span style="font-size:15px">kg</span></div><div class="stat-s">Threshold: 5 kg</div></div>
+          <div class="stat"><div class="stat-l">Due Amount</div><div class="stat-v" style="color:var(--acc)">₹120</div><div class="stat-s">For this month</div></div>
+        </div>
+        <div class="card" style="margin-bottom:18px">
+          <div class="sec-title">Next Collection 🚛</div>
+          <div style="display:flex;align-items:center;gap:18px">
+            <div style="font-size:44px">🚛</div>
+            <div>
+              <div style="font-weight:800;font-size:18px;color:var(--g1)" id="next-col-day">Loading...</div>
+              <div style="color:var(--muted);font-size:13px" id="next-col-date">8:00 AM – 10:00 AM</div>
+              <div style="font-size:13px;margin-top:5px">Ward: <strong id="u-ward-display">—</strong> · Panchayath: <strong id="u-panch-display">—</strong></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-title">Recent Alerts</div>
+          <div class="alert a-warn">⚠️ Bin is Half Full — collection scheduled for tomorrow</div>
+          <div class="alert a-ok">✅ Waste collected successfully on 20 Mar 2024</div>
+        </div>
+      </div>
+
+      <!-- BIN STATUS -->
+      <div id="u-bin" class="usec fade-up" style="display:none">
+        <div class="ph"><h1>Bin Status 🗑️</h1><p>Real-time sensor data from your smart bin</p></div>
+        <div class="g2" style="margin-bottom:18px">
+          <div class="card" style="text-align:center">
+            <div style="font-size:40px;margin-bottom:8px">♻️</div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px">Recyclable</div>
+            <div class="fb-bg"><div class="fb" id="rec-bar" style="width:60%;background:var(--g2)"></div></div>
+            <div style="font-size:13px;color:var(--muted);margin-top:6px" id="rec-txt">60% Full · 16 cm</div>
+          </div>
+          <div class="card" style="text-align:center">
+            <div style="font-size:40px;margin-bottom:8px">🚮</div>
+            <div style="font-weight:700;font-size:15px;margin-bottom:8px">Non-Recyclable</div>
+            <div class="fb-bg"><div class="fb" id="nonrec-bar" style="width:35%;background:var(--red)"></div></div>
+            <div style="font-size:13px;color:var(--muted);margin-top:6px" id="nonrec-txt">35% Full · 26 cm</div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-title">Weight Sensor</div>
+          <div style="display:flex;align-items:center;gap:20px">
+            <div style="font-size:42px;font-weight:800;color:var(--g1);font-family:'Space Mono',monospace" id="weight-display">3.2 kg</div>
+            <div>
+              <span class="badge b-y">⚠️ Threshold: 5 kg</span>
+              <div style="font-size:13px;color:var(--muted);margin-top:6px">Status: <strong>Normal</strong></div>
+            </div>
+          </div>
+        </div>
+        <div style="margin-top:14px"><button class="btn btn-o" onclick="refreshSensor()">🔄 Refresh Sensor Data</button></div>
+      </div>
+
+      <!-- PAYMENT -->
+      <div id="u-pay" class="usec fade-up" style="display:none">
+        <div class="ph"><h1>Payments 💳</h1><p>Pay for your waste collection service and view history</p></div>
+
+        <!-- Payment stats row -->
+        <div class="g3" style="margin-bottom:20px">
+          <div class="stat"><div class="stat-l">Total Paid</div><div class="stat-v" id="total-paid-stat" style="color:var(--g1)">₹0</div><div class="stat-s">All time</div></div>
+          <div class="stat"><div class="stat-l">Last Payment</div><div class="stat-v" id="last-pay-stat" style="font-size:16px">—</div><div class="stat-s" id="last-pay-date">No payments yet</div></div>
+          <div class="stat"><div class="stat-l">Transactions</div><div class="stat-v" id="txn-count-stat">0</div><div class="stat-s">Total count</div></div>
+        </div>
+
+        <div class="g2">
+          <!-- LEFT: Make payment -->
+          <div class="card">
+            <div class="sec-title">Make a Payment</div>
+
+            <!-- Service type selector -->
+            <div class="fg">
+              <label>Service Type</label>
+              <select id="pay-service" onchange="updatePayAmount()">
+                <option value="120">Monthly Collection — ₹120</option>
+                <option value="100">Basic Collection — ₹100</option>
+                <option value="80">Half Month — ₹80</option>
+                <option value="custom">Enter Custom Amount</option>
+              </select>
+            </div>
+
+            <!-- Custom amount (shown only when custom selected) -->
+            <div class="fg" id="custom-amt-wrap" style="display:none">
+              <label>Enter Amount (₹)</label>
+              <input id="custom-amt" type="number" placeholder="e.g. 150" min="1" oninput="syncCustomAmt()">
+            </div>
+
+            <!-- Summary box -->
+            <div class="pay-sum" id="pay-summary-box">
+              <div class="pay-row"><span>Service</span><span id="ps-service">Monthly Collection</span></div>
+              <div class="pay-row"><span id="ps-month-label">Month</span><span id="ps-month" style="font-weight:600"></span></div>
+              <div class="pay-row pay-total"><span>Amount</span><span style="color:var(--g1)" id="ps-amount">₹120</span></div>
+            </div>
+
+            <div id="pay-msg" style="display:none;margin-bottom:12px"></div>
+
+            <!-- Method -->
+            <div class="fg">
+              <label>Payment Method</label>
+              <select id="pay-method" onchange="togglePayFields()">
+                <option value="UPI">UPI</option>
+                <option value="Razorpay">Razorpay (Simulated)</option>
+                <option value="Card">Credit / Debit Card</option>
+                <option value="Net Banking">Net Banking</option>
+                <option value="Cash">Cash on Collection</option>
+              </select>
+            </div>
+
+            <!-- UPI fields -->
+            <div id="upi-wrap">
+              <div class="fg">
+                <label>UPI ID</label>
+                <input id="upi-id" placeholder="yourname@upi">
+              </div>
+            </div>
+
+            <!-- Card fields -->
+            <div id="card-wrap" style="display:none">
+              <div class="fg"><label>Card Number</label><input id="card-num" placeholder="XXXX XXXX XXXX XXXX" maxlength="19" oninput="formatCard(this)"></div>
+              <div class="fg-row">
+                <div class="fg"><label>Expiry</label><input id="card-exp" placeholder="MM/YY" maxlength="5"></div>
+                <div class="fg"><label>CVV</label><input id="card-cvv" placeholder="CVV" maxlength="3" type="password"></div>
+              </div>
+              <div class="fg"><label>Name on Card</label><input id="card-name" placeholder="Full name"></div>
+            </div>
+
+            <!-- Razorpay info -->
+            <div id="rzp-wrap" style="display:none">
+              <div class="alert a-info">ℹ️ This simulates a Razorpay payment gateway. In production, integrate with your Razorpay Key ID.</div>
+            </div>
+
+            <!-- Pay button -->
+            <button class="btn btn-p btn-lg" id="pay-btn" onclick="makePayment()">
+              <span id="pay-btn-text">Pay ₹120 →</span>
+            </button>
+
+            <!-- Processing animation (hidden) -->
+            <div id="pay-processing" style="display:none;text-align:center;padding:16px">
+              <div style="font-size:28px;animation:spin 1s linear infinite;display:inline-block">⏳</div>
+              <div style="font-size:13px;color:var(--muted);margin-top:6px">Processing payment...</div>
+            </div>
+          </div>
+
+          <!-- RIGHT: Payment history -->
+          <div class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+              <div class="sec-title" style="margin-bottom:0">Payment History</div>
+              <button class="btn btn-o btn-sm" onclick="exportPayments()">⬇ Export</button>
+            </div>
+            <div id="pay-history-list">
+              <div class="empty"><div class="ei">💳</div><p>No payments yet</p></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- HISTORY -->
+      <div id="u-hist" class="usec fade-up" style="display:none">
+        <div class="ph"><h1>Collection History 📋</h1><p>All waste collection records</p></div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Date</th><th>Waste Type</th><th>Weight</th><th>Worker</th><th>Status</th></tr></thead>
+              <tbody>
+                <tr><td>22 Mar 2024</td><td>Mixed Plastic</td><td>2.8 kg</td><td>Kiran K</td><td><span class="badge b-g">Collected</span></td></tr>
+                <tr><td>20 Mar 2024</td><td>Recyclable</td><td>1.5 kg</td><td>Shanima</td><td><span class="badge b-g">Collected</span></td></tr>
+                <tr><td>18 Mar 2024</td><td>Non-Recyclable</td><td>3.1 kg</td><td>Kiran K</td><td><span class="badge b-g">Collected</span></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- FEEDBACK -->
+      <div id="u-fb" class="usec fade-up" style="display:none">
+        <div class="ph"><h1>Give Feedback ⭐</h1><p>Rate your waste collection service</p></div>
+        <div class="card" style="max-width:480px">
+          <div class="fg"><label>Worker</label>
+            <select id="fb-worker"><option>Shanima V S</option></select>
+          </div>
+          <div class="fg">
+            <label>Rating</label>
+            <div class="stars" id="stars">
+              <span class="star on" onclick="setStar(1)">★</span>
+              <span class="star on" onclick="setStar(2)">★</span>
+              <span class="star on" onclick="setStar(3)">★</span>
+              <span class="star on" onclick="setStar(4)">★</span>
+              <span class="star"   onclick="setStar(5)">★</span>
+            </div>
+          </div>
+          <div class="fg"><label>Comment</label><textarea id="fb-comment" rows="3" placeholder="Your experience..."></textarea></div>
+          <div id="fb-msg" style="display:none"></div>
+          <button class="btn btn-p" style="width:100%" onclick="submitFeedback()">Submit Feedback</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  WORKER DASHBOARD
+══════════════════════════════════════════ -->
+<div id="pg-worker" class="page">
+  <nav>
+    <div class="brand"><div class="brand-icon">🚛</div> Worker Portal</div>
+    <div class="nav-right">
+      <span class="role-chip">🚛 <span id="w-name-chip">Shanima V S</span></span>
+      <button class="btn btn-o btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="layout">
+    <div class="sidebar">
+      <button class="si active" onclick="wTab('w-home',this)"><span class="si-icon">📊</span>Dashboard</button>
+      <button class="si" onclick="wTab('w-bins',this)"><span class="si-icon">🗑️</span>Bin Status</button>
+      <button class="si" onclick="wTab('w-route',this)"><span class="si-icon">🗺️</span>Route Map</button>
+      <button class="si" onclick="wTab('w-pay',this)"><span class="si-icon">💰</span>Payments</button>
+      <div class="sdiv"></div>
+      <button class="si" onclick="wTab('w-fbs',this)"><span class="si-icon">⭐</span>Feedbacks</button>
+    </div>
+    <div class="content">
+
+      <div id="w-home" class="wsec fade-up">
+        <div class="ph"><h1>Welcome! 👋</h1><p id="w-welcome-sub">Worker Dashboard</p></div>
+        <div class="g4" style="margin-bottom:20px">
+          <div class="stat"><div class="stat-l">Bins Today</div><div class="stat-v">8</div><div class="stat-s">3 pending · 5 done</div></div>
+          <div class="stat"><div class="stat-l">Full Bins</div><div class="stat-v" style="color:var(--red)">2</div><div class="stat-s">Need immediate pickup</div></div>
+          <div class="stat"><div class="stat-l">My Rating</div><div class="stat-v" style="color:var(--acc)">4.8⭐</div><div class="stat-s">48 reviews</div></div>
+        </div>
+        <div class="card">
+          <div class="sec-title">Priority Bins 🚨</div>
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Bin ID</th><th>Location</th><th>Fill Level</th><th>Weight</th><th>Action</th></tr></thead>
+              <tbody>
+                <tr><td><strong>BIN-005</strong></td><td>House 12, Ward 5</td><td><div style="display:flex;align-items:center;gap:8px"><div class="fb-bg" style="width:90px"><div class="fb" style="width:90%;background:var(--red)"></div></div>90%</div></td><td>4.8 kg</td><td><button class="btn btn-p btn-sm" onclick="markDone(this)">✓ Done</button></td></tr>
+                <tr><td><strong>BIN-009</strong></td><td>House 7, Ward 5</td><td><div style="display:flex;align-items:center;gap:8px"><div class="fb-bg" style="width:90px"><div class="fb" style="width:80%;background:var(--acc)"></div></div>80%</div></td><td>3.9 kg</td><td><button class="btn btn-p btn-sm" onclick="markDone(this)">✓ Done</button></td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="w-bins" class="wsec fade-up" style="display:none">
+        <div class="ph"><h1>All Bins 🗑️</h1><p>Real-time status across your ward</p></div>
+        <div class="g3">
+          <div class="card" style="text-align:center"><div style="font-size:36px">🔴</div><div style="font-weight:700;margin:6px 0">BIN-001</div><div class="fb-bg"><div class="fb" style="width:90%;background:var(--red)"></div></div><div style="font-size:12px;color:var(--muted);margin-top:5px">90% · 4.5 kg</div><span class="badge b-r" style="margin-top:8px;display:inline-block">FULL</span></div>
+          <div class="card" style="text-align:center"><div style="font-size:36px">🟡</div><div style="font-weight:700;margin:6px 0">BIN-002</div><div class="fb-bg"><div class="fb" style="width:65%;background:var(--acc)"></div></div><div style="font-size:12px;color:var(--muted);margin-top:5px">65% · 3.1 kg</div><span class="badge b-y" style="margin-top:8px;display:inline-block">HALF</span></div>
+          <div class="card" style="text-align:center"><div style="font-size:36px">🟢</div><div style="font-weight:700;margin:6px 0">BIN-003</div><div class="fb-bg"><div class="fb" style="width:25%;background:var(--g2)"></div></div><div style="font-size:12px;color:var(--muted);margin-top:5px">25% · 1.2 kg</div><span class="badge b-g" style="margin-top:8px;display:inline-block">OK</span></div>
+        </div>
+      </div>
+
+      <div id="w-route" class="wsec fade-up" style="display:none;overflow:hidden">
+        <div class="ph"><h1>Route Map 🗺️</h1><p>Today's optimal waste collection route · Mulavoor, Muvattupuzha</p></div>
+
+        <!-- Route summary bar -->
+        <div class="g3" style="margin-bottom:18px">
+          <div class="stat"><div class="stat-l">Total Stops</div><div class="stat-v">4</div><div class="stat-s">Ward 5, Mulavoor</div></div>
+          <div class="stat"><div class="stat-l">Est. Distance</div><div class="stat-v">3.2 <span style="font-size:15px">km</span></div><div class="stat-s">Optimised route</div></div>
+          <div class="stat"><div class="stat-l">Est. Time</div><div class="stat-v">~55 <span style="font-size:15px">min</span></div><div class="stat-s">Start: 8:00 AM</div></div>
+        </div>
+
+        <!-- Map: pure CSS, no SVG text nodes -->
+        <div style="position:relative;width:100%;height:420px;background:#e8f0e4;border-radius:var(--r);overflow:hidden;user-select:none">
+          <!-- Header bar -->
+          <div style="position:absolute;top:0;left:0;right:0;background:#0d4a26;color:#fff;font-size:13px;font-weight:700;padding:10px 16px;z-index:10;display:flex;justify-content:space-between;align-items:center">
+            <span>&#128205; Mulavoor, Muvattupuzha &#8212; Ward 5</span>
+            <span style="font-size:11px;color:#c8f0d8">Static Map View</span>
+          </div>
+          <!-- Green terrain patches -->
+          <div style="position:absolute;top:40px;left:0;width:120px;height:80px;background:#c8dfc0;border-radius:50%;opacity:.7"></div>
+          <div style="position:absolute;top:40px;right:10px;width:100px;height:60px;background:#c8dfc0;border-radius:50%;opacity:.6"></div>
+          <div style="position:absolute;bottom:60px;left:10px;width:110px;height:70px;background:#c8dfc0;border-radius:50%;opacity:.6"></div>
+          <div style="position:absolute;bottom:40px;right:20px;width:120px;height:80px;background:#c8dfc0;border-radius:50%;opacity:.5"></div>
+          <div style="position:absolute;top:160px;right:0;width:80px;height:120px;background:#a8cce8;border-radius:50%;opacity:.5"></div>
+          <!-- Roads -->
+          <div style="position:absolute;top:40px;left:50%;width:12px;bottom:0;background:#f8f8f8;transform:translateX(-50%);box-shadow:0 0 0 2px #e8c840"></div>
+          <div style="position:absolute;top:200px;left:0;right:0;height:10px;background:#f5e680;opacity:.85"></div>
+          <div style="position:absolute;top:100px;left:0;right:60%;height:7px;background:#f0f0f0;opacity:.7;transform:rotate(-3deg)"></div>
+          <div style="position:absolute;top:300px;left:0;right:40%;height:6px;background:#f0f0f0;opacity:.6;transform:rotate(2deg)"></div>
+          <!-- Blue route line -->
+          <svg style="position:absolute;top:40px;left:0;width:100%;height:380px;pointer-events:none" viewBox="0 0 400 380" preserveAspectRatio="none">
+            <polyline points="200,30 198,90 196,150 194,210 192,270 190,330" fill="none" stroke="#1a73e8" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
+            <polyline points="200,30 198,90 196,150 194,210 192,270 190,330" fill="none" stroke="#4a9ffa" stroke-width="3" stroke-linecap="round" opacity=".5"/>
+          </svg>
+          <!-- START marker -->
+          <div style="position:absolute;top:62px;left:50%;transform:translateX(-50%);width:22px;height:22px;background:#0d4a26;border-radius:50%;border:3px solid white;z-index:5;display:flex;align-items:center;justify-content:center">
+            <div style="width:6px;height:6px;background:#0d4a26;border-radius:50%;background:white"></div>
+          </div>
+          <!-- Stop 1 - BIN-001 red -->
+          <div style="position:absolute;top:118px;left:50%;transform:translateX(-50%);z-index:5">
+            <div style="width:28px;height:28px;background:#e53e3e;border-radius:50%;color:white;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3)">1</div>
+            <div style="position:absolute;left:32px;top:4px;background:#e53e3e;color:white;font-size:10px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap">BIN-001 90%</div>
+          </div>
+          <!-- Stop 2 - BIN-004 red -->
+          <div style="position:absolute;top:188px;left:50%;transform:translateX(-50%);z-index:5">
+            <div style="width:28px;height:28px;background:#e53e3e;border-radius:50%;color:white;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3)">2</div>
+            <div style="position:absolute;left:32px;top:4px;background:#e53e3e;color:white;font-size:10px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap">BIN-004 95%</div>
+          </div>
+          <!-- Stop 3 - BIN-002 orange -->
+          <div style="position:absolute;top:258px;left:50%;transform:translateX(-50%);z-index:5">
+            <div style="width:28px;height:28px;background:#f5a623;border-radius:50%;color:white;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3)">3</div>
+            <div style="position:absolute;left:32px;top:4px;background:#f5a623;color:white;font-size:10px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap">BIN-002 65%</div>
+          </div>
+          <!-- Stop 4 - BIN-006 orange -->
+          <div style="position:absolute;top:328px;left:50%;transform:translateX(-50%);z-index:5">
+            <div style="width:28px;height:28px;background:#f5a623;border-radius:50%;color:white;font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(0,0,0,.3)">4</div>
+            <div style="position:absolute;left:32px;top:4px;background:#f5a623;color:white;font-size:10px;font-weight:700;padding:3px 7px;border-radius:10px;white-space:nowrap">BIN-006 50%</div>
+          </div>
+          <!-- END depot marker -->
+          <div style="position:absolute;bottom:30px;left:50%;transform:translateX(-50%);width:28px;height:28px;background:#0d4a26;border-radius:50%;color:white;font-size:14px;display:flex;align-items:center;justify-content:center;z-index:5;box-shadow:0 2px 6px rgba(0,0,0,.3)">&#127937;</div>
+          <!-- North arrow - pure CSS, no text -->
+          <div style="position:absolute;bottom:20px;left:16px;width:20px;height:20px;color:#0d4a26;font-size:20px;line-height:1">&#8593;</div>
+        </div>
+
+        <!-- Route stops -->
+        <div class="card" style="margin-top:18px">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+            <div class="sec-title" style="margin-bottom:0">Today's Collection Stops</div>
+            <span class="badge b-g">🟢 Route Active</span>
+          </div>
+
+          <!-- Visual route steps -->
+          <div style="display:flex;flex-direction:column;gap:0;margin-bottom:18px">
+            <div style="display:flex;align-items:stretch;gap:14px">
+              <div style="display:flex;flex-direction:column;align-items:center">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--g1);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">S</div>
+                <div style="width:2px;flex:1;background:var(--g3);min-height:20px"></div>
+              </div>
+              <div style="padding:6px 0 16px">
+                <div style="font-weight:700;font-size:14px">Start — Depot</div>
+                <div style="font-size:12px;color:var(--muted)">Mulavoor Panchayath Office · 8:00 AM</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:stretch;gap:14px">
+              <div style="display:flex;flex-direction:column;align-items:center">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">1</div>
+                <div style="width:2px;flex:1;background:var(--g3);min-height:20px"></div>
+              </div>
+              <div style="padding:6px 0 16px">
+                <div style="font-weight:700;font-size:14px">BIN-001 <span class="badge b-r" style="margin-left:6px">FULL 90%</span></div>
+                <div style="font-size:12px;color:var(--muted)">House 1, Ward 5, Mulavoor · ETA 8:10 AM · Weight: 4.5 kg</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:stretch;gap:14px">
+              <div style="display:flex;flex-direction:column;align-items:center">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--red);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">2</div>
+                <div style="width:2px;flex:1;background:var(--g3);min-height:20px"></div>
+              </div>
+              <div style="padding:6px 0 16px">
+                <div style="font-weight:700;font-size:14px">BIN-004 <span class="badge b-r" style="margin-left:6px">FULL 95%</span></div>
+                <div style="font-size:12px;color:var(--muted)">House 9, Ward 5, Mulavoor · ETA 8:25 AM · Weight: 4.9 kg</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:stretch;gap:14px">
+              <div style="display:flex;flex-direction:column;align-items:center">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">3</div>
+                <div style="width:2px;flex:1;background:var(--g3);min-height:20px"></div>
+              </div>
+              <div style="padding:6px 0 16px">
+                <div style="font-weight:700;font-size:14px">BIN-002 <span class="badge b-y" style="margin-left:6px">HALF 65%</span></div>
+                <div style="font-size:12px;color:var(--muted)">House 4, Ward 5, Mulavoor · ETA 8:40 AM · Weight: 3.1 kg</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:stretch;gap:14px">
+              <div style="display:flex;flex-direction:column;align-items:center">
+                <div style="width:32px;height:32px;border-radius:50%;background:var(--acc);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">4</div>
+                <div style="width:2px;flex:1;background:var(--g3);min-height:20px"></div>
+              </div>
+              <div style="padding:6px 0 16px">
+                <div style="font-weight:700;font-size:14px">BIN-006 <span class="badge b-y" style="margin-left:6px">HALF 50%</span></div>
+                <div style="font-size:12px;color:var(--muted)">House 15, Ward 5, Mulavoor · ETA 9:00 AM · Weight: 2.5 kg</div>
+              </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:14px">
+              <div style="width:32px;height:32px;border-radius:50%;background:var(--g1);color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">🏁</div>
+              <div>
+                <div style="font-weight:700;font-size:14px">Return to Depot</div>
+                <div style="font-size:12px;color:var(--muted)">Mulavoor Panchayath Office · ~9:15 AM</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Open in Google Maps button -->
+          <a href="https://www.google.com/maps/dir/Mulavoor+Panchayath,+Kerala/@9.9895,76.5804,15z"
+             target="_blank"
+             class="btn btn-p"
+             style="text-decoration:none;width:100%;justify-content:center">
+            🗺️ Open Route in Google Maps
+          </a>
+        </div>
+      </div>
+
+      <div id="w-pay" class="wsec fade-up" style="display:none">
+        <div class="ph"><h1>Payments 💰</h1><p>Payment status of households</p></div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table><thead><tr><th>Household</th><th>Month</th><th>Amount</th><th>Status</th></tr></thead>
+            <tbody>
+              <tr><td>House 1 · Nitha Eldho</td><td>Mar 2024</td><td>₹120</td><td><span class="badge b-y">Pending</span></td></tr>
+              <tr><td>House 4 · Fasal K</td><td>Mar 2024</td><td>₹100</td><td><span class="badge b-g">Paid</span></td></tr>
+              <tr><td>House 7 · Anoop M</td><td>Mar 2024</td><td>₹120</td><td><span class="badge b-g">Paid</span></td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div id="w-fbs" class="wsec fade-up" style="display:none">
+        <div class="ph"><h1>Feedbacks ⭐</h1></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><strong>House 4 · Nitha Eldho</strong><span style="color:var(--acc)">★★★★★</span></div><p style="font-size:13px;color:var(--muted)">Very punctual and efficient!</p></div>
+          <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><strong>House 7 · Fasal K</strong><span style="color:var(--acc)">★★★★☆</span></div><p style="font-size:13px;color:var(--muted)">Good service overall.</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  ADMIN DASHBOARD
+══════════════════════════════════════════ -->
+<div id="pg-admin" class="page">
+  <nav>
+    <div class="brand"><div class="brand-icon">🛡️</div> Admin Portal</div>
+    <div class="nav-right">
+      <span class="role-chip">🛡️ Administrator</span>
+      <button class="btn btn-o btn-sm" onclick="logout()">Logout</button>
+    </div>
+  </nav>
+  <div class="layout">
+    <div class="sidebar">
+      <button class="si active" onclick="aTab('a-home',this)"><span class="si-icon">📊</span>Dashboard</button>
+      <button class="si" onclick="aTab('a-bins',this)"><span class="si-icon">🗑️</span>All Bins</button>
+      <button class="si" onclick="aTab('a-users',this)"><span class="si-icon">👥</span>Users</button>
+      <button class="si" onclick="aTab('a-workers',this)"><span class="si-icon">🚛</span>Workers</button>
+      <div class="sdiv"></div>
+      <button class="si" onclick="aTab('a-reports',this)"><span class="si-icon">📈</span>Reports</button>
+      <button class="si" onclick="aTab('a-fbs',this)"><span class="si-icon">⭐</span>Feedbacks</button>
+    </div>
+    <div class="content">
+
+      <div id="a-home" class="asec fade-up">
+        <div class="ph"><h1>Admin Dashboard 🛡️</h1><p>Mulavoor Panchayath — System Overview</p></div>
+        <div class="g4" style="margin-bottom:20px">
+          <div class="stat"><div class="stat-l">Total Bins</div><div class="stat-v">24</div><div class="stat-s">6 wards</div></div>
+          <div class="stat"><div class="stat-l">Full Bins</div><div class="stat-v" style="color:var(--red)">5</div><div class="stat-s">Need pickup</div></div>
+          <div class="stat"><div class="stat-l">Registered Users</div><div class="stat-v" id="a-user-count">0</div><div class="stat-s">Total accounts</div></div>
+        </div>
+        <div class="g2" style="margin-bottom:18px">
+          <div class="card">
+            <div class="sec-title">Bin Overview</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:6px">
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>🟢 Empty / Low</span><strong>14</strong></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>🟡 Half Full</span><strong>5</strong></div>
+              <div style="display:flex;justify-content:space-between;align-items:center;font-size:13px"><span>🔴 Full</span><strong>5</strong></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="sec-title">AI Classification Today</div>
+            <div style="display:flex;justify-content:space-around;padding:12px 0">
+              <div style="text-align:center"><div style="font-size:28px">♻️</div><div style="font-size:20px;font-weight:800;color:var(--g1)">68%</div><div style="font-size:12px;color:var(--muted)">Recyclable</div></div>
+              <div style="text-align:center"><div style="font-size:28px">🚮</div><div style="font-size:20px;font-weight:800;color:var(--red)">32%</div><div style="font-size:12px;color:var(--muted)">Non-Recyclable</div></div>
+              <div style="text-align:center"><div style="font-size:28px">🤖</div><div style="font-size:20px;font-weight:800;color:var(--acc)">~90%</div><div style="font-size:12px;color:var(--muted)">AI Accuracy</div></div>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="sec-title">Alerts <span class="notif-dot pulse"></span></div>
+          <div class="alert a-err">🔴 BIN-001 (House 1, Ward 5) — 90% full — 4.5 kg · Needs pickup</div>
+          <div class="alert a-warn">🟡 BIN-008 (House 3, Ward 3) — Weight exceeded 5 kg</div>
+          <div class="alert a-ok">✅ Worker Kiran K collected 5 bins — 24 kg total</div>
+        </div>
+      </div>
+
+      <div id="a-bins" class="asec fade-up" style="display:none">
+        <div class="ph"><h1>All Bins 🗑️</h1></div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table><thead><tr><th>Bin ID</th><th>Ward</th><th>Fill Level</th><th>Weight</th><th>Status</th><th>Updated</th></tr></thead>
+            <tbody>
+              <tr><td><strong>BIN-001</strong></td><td>Ward 5</td><td><div style="display:flex;align-items:center;gap:8px"><div class="fb-bg" style="width:80px"><div class="fb" style="width:90%;background:var(--red)"></div></div>90%</div></td><td>4.5 kg</td><td><span class="badge b-r">FULL</span></td><td>2 min</td></tr>
+              <tr><td><strong>BIN-002</strong></td><td>Ward 5</td><td><div style="display:flex;align-items:center;gap:8px"><div class="fb-bg" style="width:80px"><div class="fb" style="width:65%;background:var(--acc)"></div></div>65%</div></td><td>3.1 kg</td><td><span class="badge b-y">HALF</span></td><td>5 min</td></tr>
+              <tr><td><strong>BIN-003</strong></td><td>Ward 3</td><td><div style="display:flex;align-items:center;gap:8px"><div class="fb-bg" style="width:80px"><div class="fb" style="width:20%;background:var(--g2)"></div></div>20%</div></td><td>1.0 kg</td><td><span class="badge b-g">OK</span></td><td>8 min</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <div id="a-users" class="asec fade-up" style="display:none">
+        <div class="ph"><h1>Registered Users 👥</h1><p>All households using the system</p></div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>Ward</th><th>Panchayath</th><th>Bin ID</th><th>Registered</th></tr></thead>
+              <tbody id="a-users-tbody">
+                <tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No users registered yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="a-workers" class="asec fade-up" style="display:none">
+        <div class="ph"><h1>Workers 🚛</h1></div>
+        <div class="card">
+          <div class="tbl-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Username</th><th>Phone</th><th>Ward</th><th>Panchayath</th><th>Registered</th></tr></thead>
+              <tbody id="a-workers-tbody">
+                <tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">No workers registered yet</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="a-reports" class="asec fade-up" style="display:none">
+        <div class="ph"><h1>Reports 📈</h1></div>
+        <div class="g2">
+          <div class="card">
+            <div class="sec-title">Monthly Collections</div>
+            <div style="display:flex;flex-direction:column;gap:10px;margin-top:8px">
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:36px;font-size:12px">Jan</span><div style="flex:1;background:var(--g4);border-radius:4px;height:12px;overflow:hidden"><div style="background:var(--g2);width:75%;height:100%;border-radius:4px"></div></div><span style="font-size:12px;font-weight:700;width:55px;text-align:right">210 kg</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:36px;font-size:12px">Feb</span><div style="flex:1;background:var(--g4);border-radius:4px;height:12px;overflow:hidden"><div style="background:var(--g2);width:65%;height:100%;border-radius:4px"></div></div><span style="font-size:12px;font-weight:700;width:55px;text-align:right">185 kg</span></div>
+              <div style="display:flex;align-items:center;gap:10px"><span style="width:36px;font-size:12px">Mar</span><div style="flex:1;background:var(--g4);border-radius:4px;height:12px;overflow:hidden"><div style="background:var(--g1);width:85%;height:100%;border-radius:4px"></div></div><span style="font-size:12px;font-weight:700;width:55px;text-align:right">240 kg</span></div>
+            </div>
+          </div>
+          <div class="card">
+            <div class="sec-title">Revenue (March 2024)</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
+              <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid #d6edde"><span>Total Registered</span><strong id="rep-users">0 users</strong></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0;border-bottom:1px solid #d6edde"><span>Total Payments</span><strong id="rep-payments" style="color:var(--g1)">₹0</strong></div>
+              <div style="display:flex;justify-content:space-between;font-size:13px;padding:6px 0"><span>Total Waste</span><strong>240 kg</strong></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="a-fbs" class="asec fade-up" style="display:none">
+        <div class="ph"><h1>All Feedbacks ⭐</h1></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><strong>Nitha Eldho</strong> → <span style="color:var(--muted)">Shanima V S</span></div><span style="color:var(--acc)">★★★★☆</span></div><p style="font-size:13px;color:var(--muted)">Good service, can improve punctuality.</p></div>
+          <div class="card"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><div><strong>Fasal K</strong> → <span style="color:var(--muted)">Shanima V S</span></div><span style="color:var(--acc)">★★★★★</span></div><p style="font-size:13px;color:var(--muted)">Excellent! Always on time.</p></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════
+  JS
+══════════════════════════════════════════ -->
+<script>/**
+ * auth.js — Authentication & Storage
+ * Haritha Karma Sena Smart Waste Management
+ */
+
+const ADMIN_CREDENTIALS = { username: "admin", password: "admin123" };
+const WORKER_CODE = "WORKER2024";
+
+// ── Storage helpers ──────────────────────────────────────────────────────────
+const DB = {
+  getUsers()    { return JSON.parse(localStorage.getItem("hks_users")    || "[]"); },
+  getWorkers()  { return JSON.parse(localStorage.getItem("hks_workers")  || "[]"); },
+  getPayments() { return JSON.parse(localStorage.getItem("hks_payments") || "[]"); },
+  saveUsers(d)    { localStorage.setItem("hks_users",    JSON.stringify(d)); },
+  saveWorkers(d)  { localStorage.setItem("hks_workers",  JSON.stringify(d)); },
+  savePayments(d) { localStorage.setItem("hks_payments", JSON.stringify(d)); },
+
+  addUser(user) {
+    const users = this.getUsers();
+    users.push(user);
+    this.saveUsers(users);
+  },
+  addWorker(worker) {
+    const workers = this.getWorkers();
+    workers.push(worker);
+    this.saveWorkers(workers);
+  },
+  addPayment(payment) {
+    const payments = this.getPayments();
+    payments.push(payment);
+    this.savePayments(payments);
+  },
+  findUser(username) {
+    return this.getUsers().find(u => u.username === username);
+  },
+  findWorker(username) {
+    return this.getWorkers().find(w => w.username === username);
+  },
+  getUserPayments(userId) {
+    return this.getPayments().filter(p => p.userId === userId);
+  }
+};
+
+// ── Session ──────────────────────────────────────────────────────────────────
+const Session = {
+  set(role, data) { sessionStorage.setItem("hks_session", JSON.stringify({ role, ...data })); },
+  get()           { return JSON.parse(sessionStorage.getItem("hks_session") || "null"); },
+  clear()         { sessionStorage.removeItem("hks_session"); }
+};
+
+// ── Validation ───────────────────────────────────────────────────────────────
+const Validate = {
+  notEmpty(val, label) {
+    if (!val || val.trim() === "") return `${label} is required.`;
+    return null;
+  },
+  phone(val) {
+    if (!/^[6-9]\d{9}$/.test(val)) return "Enter a valid 10-digit phone number.";
+    return null;
+  },
+  password(val) {
+    if (val.length < 6) return "Password must be at least 6 characters.";
+    return null;
+  },
+  usernameAvailable(username, role) {
+    if (role === "user"   && DB.findUser(username))   return "Username already taken.";
+    if (role === "worker" && DB.findWorker(username)) return "Username already taken.";
+    return null;
+  }
+};
+
+// ── Auth Functions ────────────────────────────────────────────────────────────
+function loginUser(username, password) {
+  const user = DB.findUser(username);
+  if (!user)                    return { ok: false, msg: "User not found. Please register first." };
+  if (user.password !== password) return { ok: false, msg: "Incorrect password." };
+  Session.set("user", { id: user.id, name: user.name, username: user.username, binId: user.binId });
+  return { ok: true };
+}
+
+function loginWorker(username, password) {
+  const worker = DB.findWorker(username);
+  if (!worker)                      return { ok: false, msg: "Worker not found. Please register first." };
+  if (worker.password !== password) return { ok: false, msg: "Incorrect password." };
+  Session.set("worker", { id: worker.id, name: worker.name, username: worker.username });
+  return { ok: true };
+}
+
+function loginAdmin(username, password) {
+  if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+    Session.set("admin", { name: "Administrator" });
+    return { ok: true };
+  }
+  return { ok: false, msg: "Invalid admin credentials." };
+}
+
+function registerUser(data) {
+  const errs = [
+    Validate.notEmpty(data.name,       "Full name"),
+    Validate.notEmpty(data.phone,      "Phone"),
+    Validate.phone(data.phone),
+    Validate.notEmpty(data.address,    "Address"),
+    Validate.notEmpty(data.panchayath, "Panchayath"),
+    Validate.notEmpty(data.wardNo,     "Ward number"),
+    Validate.notEmpty(data.username,   "Username"),
+    Validate.password(data.password),
+    Validate.usernameAvailable(data.username, "user"),
+  ].filter(Boolean);
+
+  if (errs.length) return { ok: false, msg: errs[0] };
+
+  const user = {
+    id:         "U" + Date.now(),
+    name:       data.name.trim(),
+    phone:      data.phone.trim(),
+    address:    data.address.trim(),
+    panchayath: data.panchayath.trim(),
+    wardNo:     data.wardNo.trim(),
+    username:   data.username.trim(),
+    password:   data.password,
+    binId:      "BIN-" + Math.floor(Math.random() * 900 + 100),
+    createdAt:  new Date().toLocaleDateString("en-IN"),
+  };
+  DB.addUser(user);
+  return { ok: true, user };
+}
+
+function registerWorker(data) {
+  if (data.workerCode !== WORKER_CODE) {
+    return { ok: false, msg: "Invalid Worker Registration Code. Contact your administrator." };
+  }
+
+  const errs = [
+    Validate.notEmpty(data.name,       "Full name"),
+    Validate.notEmpty(data.phone,      "Phone"),
+    Validate.phone(data.phone),
+    Validate.notEmpty(data.panchayath, "Panchayath"),
+    Validate.notEmpty(data.wardNo,     "Ward number"),
+    Validate.notEmpty(data.username,   "Username"),
+    Validate.password(data.password),
+    Validate.usernameAvailable(data.username, "worker"),
+  ].filter(Boolean);
+
+  if (errs.length) return { ok: false, msg: errs[0] };
+
+  const worker = {
+    id:         "W" + Date.now(),
+    name:       data.name.trim(),
+    phone:      data.phone.trim(),
+    panchayath: data.panchayath.trim(),
+    wardNo:     data.wardNo.trim(),
+    username:   data.username.trim(),
+    password:   data.password,
+    createdAt:  new Date().toLocaleDateString("en-IN"),
+  };
+  DB.addWorker(worker);
+  return { ok: true, worker };
+}
+
+function addPayment(userId, method, amount, month, status) {
+  const payment = {
+    id:     "TXN" + Math.floor(Math.random() * 900000 + 100000),
+    userId,
+    method,
+    amount,
+    month,
+    date:   new Date().toLocaleDateString("en-IN"),
+    status: status || "Success",
+  };
+  DB.addPayment(payment);
+  return payment;
+}
+</script>
+<script>
+// ── State
+let currentRole = "user";
+let starVal = 4;
+let payAmount = 120;
+
+function setRole(role, el) {
+  currentRole = role;
+  document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+  el.classList.add("active");
+  const regLink = document.getElementById("reg-link-wrap");
+  if (regLink) regLink.style.display = role === "admin" ? "none" : "block";
+  const wcf = document.getElementById("worker-code-field");
+  if (wcf) wcf.style.display = "none";
+  clearMsg("auth-msg");
+  showForm("frm-login");
+}
+
+function showForm(id) {
+  ["frm-login","frm-register"].forEach(f => { const el=document.getElementById(f); if(el) el.style.display="none"; });
+  const target = document.getElementById(id);
+  if (target) target.style.display = "block";
+  const wcf = document.getElementById("worker-code-field");
+  if (wcf) wcf.style.display = (id==="frm-register" && currentRole==="worker") ? "flex" : "none";
+}
+
+function showMsg(id, text, type) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.innerHTML = `<div class="alert a-${type}">${text}</div>`;
+  el.style.display = "block";
+}
+function clearMsg(id) {
+  const el = document.getElementById(id);
+  if (el) { el.innerHTML=""; el.style.display="none"; }
+}
+
+function doLogin() {
+  const u = document.getElementById("li-user").value.trim();
+  const p = document.getElementById("li-pass").value;
+  if (!u||!p) { showMsg("auth-msg","Please enter both username and password.","err"); return; }
+  let result;
+  if      (currentRole==="user")   result = loginUser(u,p);
+  else if (currentRole==="worker") result = loginWorker(u,p);
+  else                             result = loginAdmin(u,p);
+  if (!result.ok) { showMsg("auth-msg",result.msg,"err"); return; }
+  clearMsg("auth-msg");
+  if (currentRole==="user") {
+    const s = Session.get();
+    const ud = DB.findUser(s.username);
+    document.getElementById("u-name-chip").textContent = s.name;
+    document.getElementById("u-welcome-sub").textContent = "Welcome back, "+s.name+"!";
+    document.getElementById("u-ward-display").textContent  = ud?.wardNo  || "—";
+    document.getElementById("u-panch-display").textContent = ud?.panchayath || "—";
+    setNextCollection();
+    renderPayHistory(s.id);
+    updatePayStats(s.id);
+    updatePaySummaryMonth();
+    showPage("pg-user");
+  } else if (currentRole==="worker") {
+    const s = Session.get();
+    document.getElementById("w-name-chip").textContent = s.name;
+    document.getElementById("w-welcome-sub").textContent = "Welcome, "+s.name+" · Mulavoor Panchayath";
+    showPage("pg-worker");
+  } else {
+    renderAdminData();
+    showPage("pg-admin");
+  }
+}
+
+function doRegister() {
+  const data = {
+    name:       document.getElementById("r-name").value,
+    phone:      document.getElementById("r-phone").value,
+    address:    document.getElementById("r-addr")?.value || "",
+    panchayath: document.getElementById("r-panch").value,
+    wardNo:     document.getElementById("r-ward").value,
+    username:   document.getElementById("r-uname").value,
+    password:   document.getElementById("r-pass").value,
+    workerCode: document.getElementById("r-wcode")?.value || "",
+  };
+  let result = currentRole==="worker" ? registerWorker(data) : registerUser(data);
+  if (!result.ok) { showMsg("auth-msg",result.msg,"err"); return; }
+  showMsg("auth-msg","✅ Account created! You can now sign in.","ok");
+  showForm("frm-login");
+  ["r-name","r-phone","r-addr","r-panch","r-ward","r-uname","r-pass","r-wcode"]
+    .forEach(id => { const el=document.getElementById(id); if(el) el.value=""; });
+}
+
+function showPage(id) {
+  document.querySelectorAll(".page").forEach(p => p.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+}
+function logout() {
+  Session.clear();
+  showPage("pg-login");
+  document.getElementById("li-user").value="";
+  document.getElementById("li-pass").value="";
+}
+
+function uTab(id,el) {
+  document.querySelectorAll(".usec").forEach(s => s.style.display="none");
+  document.getElementById(id).style.display="block";
+  document.querySelectorAll("#pg-user .si").forEach(s => s.classList.remove("active"));
+  el.classList.add("active");
+  if (id==="u-pay") { const s=Session.get(); if(s){renderPayHistory(s.id);updatePayStats(s.id);} }
+}
+function wTab(id,el) {
+  document.querySelectorAll(".wsec").forEach(s => s.style.display="none");
+  document.getElementById(id).style.display="block";
+  document.querySelectorAll("#pg-worker .si").forEach(s => s.classList.remove("active"));
+  el.classList.add("active");
+}
+function aTab(id,el) {
+  document.querySelectorAll(".asec").forEach(s => s.style.display="none");
+  document.getElementById(id).style.display="block";
+  document.querySelectorAll("#pg-admin .si").forEach(s => s.classList.remove("active"));
+  el.classList.add("active");
+  if (["a-users","a-workers","a-reports"].includes(id)) renderAdminData();
+}
+
+function setNextCollection() {
+  const today = new Date();
+  const day = today.getDay();
+  const collectionDays = [1,3,5];
+  let daysAhead = 1;
+  for (let i=1;i<=7;i++) { if(collectionDays.includes((day+i)%7)){daysAhead=i;break;} }
+  const next = new Date(today);
+  next.setDate(today.getDate()+daysAhead);
+  const label = daysAhead===1 ? "Tomorrow" : next.toLocaleDateString("en-IN",{weekday:"long"});
+  const dateStr = next.toLocaleDateString("en-IN",{day:"numeric",month:"long",year:"numeric"});
+  const el1=document.getElementById("next-col-day");
+  const el2=document.getElementById("next-col-date");
+  if(el1) el1.textContent=label;
+  if(el2) el2.textContent=dateStr+" · 8:00 AM – 10:00 AM";
+}
+
+function refreshSensor() {
+  const r=Math.floor(Math.random()*80+10);
+  const n=Math.floor(Math.random()*80+10);
+  const w=(Math.random()*4+0.5).toFixed(1);
+  document.getElementById("rec-bar").style.width=r+"%";
+  document.getElementById("nonrec-bar").style.width=n+"%";
+  document.getElementById("rec-txt").textContent=r+"% Full · "+Math.floor((100-r)*.4)+" cm";
+  document.getElementById("nonrec-txt").textContent=n+"% Full · "+Math.floor((100-n)*.4)+" cm";
+  document.getElementById("weight-display").textContent=w+" kg";
+  const stat=document.getElementById("u-bin-status");
+  if(r>80||n>80){stat.textContent="Full";stat.style.color="var(--red)";}
+  else if(r>50||n>50){stat.textContent="Half Full";stat.style.color="var(--acc)";}
+  else{stat.textContent="Empty";stat.style.color="var(--g1)";}
+}
+
+// Payment functions
+function updatePayAmount() {
+  const sel=document.getElementById("pay-service").value;
+  const customWrap=document.getElementById("custom-amt-wrap");
+  if(sel==="custom"){
+    customWrap.style.display="flex";
+    payAmount=parseInt(document.getElementById("custom-amt").value)||0;
+  } else {
+    customWrap.style.display="none";
+    payAmount=parseInt(sel);
+  }
+  const labels={"120":"Monthly Collection","100":"Basic Collection","80":"Half Month","custom":"Custom"};
+  const ps=document.getElementById("ps-service");
+  const pa=document.getElementById("ps-amount");
+  const bt=document.getElementById("pay-btn-text");
+  if(ps) ps.textContent=labels[sel]||"Custom";
+  if(pa) pa.textContent="₹"+(payAmount||"—");
+  if(bt) bt.textContent=payAmount?`Pay ₹${payAmount} →`:"Enter Amount";
+}
+function syncCustomAmt() {
+  payAmount=parseInt(document.getElementById("custom-amt").value)||0;
+  const pa=document.getElementById("ps-amount");
+  const bt=document.getElementById("pay-btn-text");
+  if(pa) pa.textContent=payAmount?"₹"+payAmount:"₹—";
+  if(bt) bt.textContent=payAmount?`Pay ₹${payAmount} →`:"Enter Amount";
+}
+function updatePaySummaryMonth() {
+  const now=new Date();
+  const el=document.getElementById("ps-month");
+  if(el) el.textContent=now.toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+}
+function togglePayFields() {
+  const m=document.getElementById("pay-method").value;
+  document.getElementById("upi-wrap").style.display  =m==="UPI"?"block":"none";
+  document.getElementById("card-wrap").style.display =m==="Card"?"block":"none";
+  document.getElementById("rzp-wrap").style.display  =m==="Razorpay"?"block":"none";
+}
+function formatCard(input) {
+  let v=input.value.replace(/\D/g,"").substring(0,16);
+  input.value=v.replace(/(.{4})/g,"$1 ").trim();
+}
+
+function makePayment() {
+  clearMsg("pay-msg");
+  const method=document.getElementById("pay-method").value;
+  const service=document.getElementById("pay-service").value;
+  const amt=service==="custom"?parseInt(document.getElementById("custom-amt").value)||0:parseInt(service);
+  if(!amt||amt<1){showMsg("pay-msg","Please enter a valid amount.","err");return;}
+  if(method==="UPI"){
+    const upiId=document.getElementById("upi-id").value.trim();
+    if(!upiId){showMsg("pay-msg","Please enter your UPI ID.","err");return;}
+    if(!/^[\w.\-_]+@[\w]+$/.test(upiId)){showMsg("pay-msg","Invalid UPI ID format (e.g. name@upi).","err");return;}
+  }
+  if(method==="Card"){
+    const num=document.getElementById("card-num").value.replace(/\s/g,"");
+    const exp=document.getElementById("card-exp").value;
+    const cvv=document.getElementById("card-cvv").value;
+    const name=document.getElementById("card-name").value;
+    if(num.length!==16){showMsg("pay-msg","Enter a valid 16-digit card number.","err");return;}
+    if(!/^\d{2}\/\d{2}$/.test(exp)){showMsg("pay-msg","Enter expiry as MM/YY.","err");return;}
+    if(cvv.length!==3){showMsg("pay-msg","Enter a valid 3-digit CVV.","err");return;}
+    if(!name.trim()){showMsg("pay-msg","Enter name on card.","err");return;}
+  }
+  document.getElementById("pay-btn").style.display="none";
+  document.getElementById("pay-processing").style.display="block";
+  setTimeout(()=>{
+    document.getElementById("pay-btn").style.display="flex";
+    document.getElementById("pay-processing").style.display="none";
+    const success=Math.random()>0.1;
+    const s=Session.get();
+    const now=new Date();
+    const monthStr=now.toLocaleDateString("en-IN",{month:"long",year:"numeric"});
+    if(success){
+      const payment=addPayment(s.id,method,amt,monthStr,"Success");
+      showPayOverlay(true,amt,payment.id,method);
+    } else {
+      addPayment(s.id,method,amt,monthStr,"Failed");
+      showPayOverlay(false,amt,null,method);
+    }
+    renderPayHistory(s.id);
+    updatePayStats(s.id);
+  },1500);
+}
+
+function showPayOverlay(success,amt,txnId,method) {
+  const overlay=document.createElement("div");
+  overlay.className="pay-success-overlay";
+  overlay.innerHTML=`<div class="pay-success-box ${success?"":"pay-fail-box"}">
+    <div class="pay-success-icon">${success?"✅":"❌"}</div>
+    <div class="pay-success-title">${success?"Payment Successful!":"Payment Failed"}</div>
+    <div class="pay-success-sub">${success?`₹${amt} paid via ${method}<br><span style="font-family:'Space Mono',monospace;font-size:12px;color:var(--muted)">${txnId}</span>`:`₹${amt} via ${method} could not be processed. Please try again.`}</div>
+    <button class="btn btn-p" onclick="this.closest('.pay-success-overlay').remove()">${success?"Done ✓":"Try Again"}</button>
+  </div>`;
+  document.body.appendChild(overlay);
+  setTimeout(()=>overlay.remove(),6000);
+}
+
+function renderPayHistory(userId) {
+  const payments=DB.getUserPayments(userId).reverse();
+  const el=document.getElementById("pay-history-list");
+  if(!payments.length){el.innerHTML=`<div class="empty"><div class="ei">💳</div><p>No payments yet</p></div>`;return;}
+  el.innerHTML=`<div class="tbl-wrap"><table><thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Month</th><th>Status</th><th>Txn ID</th></tr></thead><tbody>`+
+    payments.map(p=>`<tr>
+      <td>${p.date}</td>
+      <td style="font-weight:700">₹${p.amount}</td>
+      <td>${p.method}</td><td>${p.month}</td>
+      <td><span class="badge ${p.status==="Success"?"b-g":"b-r"}">${p.status}</span></td>
+      <td style="font-family:'Space Mono',monospace;font-size:11px;color:var(--muted)">${p.id}</td>
+    </tr>`).join("")+`</tbody></table></div>`;
+}
+
+function updatePayStats(userId) {
+  const payments=DB.getUserPayments(userId);
+  const successful=payments.filter(p=>p.status==="Success");
+  const total=successful.reduce((s,p)=>s+p.amount,0);
+  const last=successful[successful.length-1];
+  const el1=document.getElementById("total-paid-stat");
+  const el2=document.getElementById("last-pay-stat");
+  const el3=document.getElementById("last-pay-date");
+  const el4=document.getElementById("txn-count-stat");
+  if(el1) el1.textContent="₹"+total;
+  if(el2) el2.textContent=last?"₹"+last.amount:"—";
+  if(el3) el3.textContent=last?last.date:"No payments yet";
+  if(el4) el4.textContent=payments.length;
+}
+
+function exportPayments() {
+  const s=Session.get();
+  const payments=DB.getUserPayments(s.id);
+  if(!payments.length){alert("No payment history to export.");return;}
+  const rows=["Date,Amount,Method,Month,Status,Transaction ID",...payments.map(p=>`${p.date},₹${p.amount},${p.method},${p.month},${p.status},${p.id}`)];
+  const blob=new Blob([rows.join("\n")],{type:"text/csv"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;a.download="payment_history.csv";a.click();
+  URL.revokeObjectURL(url);
+}
+
+function setStar(n){starVal=n;document.querySelectorAll(".star").forEach((s,i)=>s.classList.toggle("on",i<n));}
+function submitFeedback(){showMsg("fb-msg","✅ Thank you for your feedback!","ok");document.getElementById("fb-comment").value="";setTimeout(()=>clearMsg("fb-msg"),3000);}
+function markDone(btn){btn.closest("tr").style.opacity=".4";btn.textContent="✓ Collected";btn.classList.replace("btn-p","btn-o");btn.disabled=true;}
+
+function renderAdminData() {
+  const users=DB.getUsers();const workers=DB.getWorkers();
+  const pays=DB.getPayments().filter(p=>p.status==="Success");
+  const uc=document.getElementById("a-user-count");if(uc)uc.textContent=users.length;
+  const utb=document.getElementById("a-users-tbody");
+  if(utb){utb.innerHTML=users.length?users.map(u=>`<tr><td><strong>${u.name}</strong></td><td>${u.username}</td><td>${u.phone}</td><td>Ward ${u.wardNo}</td><td>${u.panchayath}</td><td>${u.binId}</td><td>${u.createdAt}</td></tr>`).join(""):
+    `<tr><td colspan="7" style="text-align:center;color:var(--muted);padding:24px">No users registered yet</td></tr>`;}
+  const wtb=document.getElementById("a-workers-tbody");
+  if(wtb){wtb.innerHTML=workers.length?workers.map(w=>`<tr><td><strong>${w.name}</strong></td><td>${w.username}</td><td>${w.phone}</td><td>Ward ${w.wardNo}</td><td>${w.panchayath}</td><td>${w.createdAt}</td></tr>`).join(""):
+    `<tr><td colspan="6" style="text-align:center;color:var(--muted);padding:24px">No workers registered yet</td></tr>`;}
+  const ru=document.getElementById("rep-users");const rp=document.getElementById("rep-payments");
+  if(ru)ru.textContent=users.length+" users";
+  if(rp)rp.textContent="₹"+pays.reduce((s,p)=>s+p.amount,0);
+}
+</script>
+</body>
+</html>
